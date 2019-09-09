@@ -1,11 +1,15 @@
 export const state = () => ({
   articles: [],
-  allArticles: []
+  allArticles: [],
+  filterObject: {
+    title: '',
+    themes: []
+  }
 })
 
 export const mutations = {
-  SET_ARTICLES(state, { type, items }) {
-    state[type] = items
+  SET_ARTICLES(state, { key, value }) {
+    state[key] = value
   }
 }
 
@@ -15,6 +19,9 @@ export const getters = {
 
     return articles.map((item) => item.id).indexOf(id)
   },
+  getArticles: (state, getters) => {
+    return ['return', 'all', 'articles', 'by', 'state', 'filter', 'value']
+  },
   getThemes: (state) => {
     return Array.from(
       new Set(
@@ -23,6 +30,9 @@ export const getters = {
           .reduce((arr, val) => arr.concat(val), [])
       )
     )
+  },
+  getAmountArticles: (state) => {
+    return state.articles.length
   }
 }
 
@@ -33,10 +43,14 @@ export const actions = {
   async getArticles({ state, commit }) {
     console.log('UPDATE STATE')
     if (!state.articles.length) {
-      const articles = await this.$axios.get('/articles')
-      const all = []
+      const answer = await this.$axios.get('/articles')
+      const allArticles = answer.data
+      const articles = allArticles.filter((article) => {
+        return article.archive !== true
+      })
 
-      console.log(all, articles)
+      commit('SET_ARTICLES', { key: 'articles', value: articles })
+      commit('SET_ARTICLES', { key: 'allArticles', value: allArticles })
 
       // col = await db.collection('articles').get();
       // col.forEach(item => {
@@ -48,9 +62,6 @@ export const actions = {
       //     }
       //     all.push(article);
       // })
-
-      // commit('set', {type: 'articles', items: articles});
-      // commit('set', {type: 'allArticles', items: all});
     }
   }
 }

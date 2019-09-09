@@ -59,11 +59,7 @@ export default {
   },
   async mounted() {
     this.grid.layout()
-
-    console.log(this.$store)
     await this.getArticles()
-
-    console.log('MOUNTED ARTICLES')
   },
   updated() {
     const that = this
@@ -107,7 +103,7 @@ export default {
               masTitle.push(array.includes(i.getAttribute('title')))
             })
 
-          return masTitle.some((i) => i)
+          return masTitle.every((i) => i)
         }
       })
     }

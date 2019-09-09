@@ -12,6 +12,7 @@
         .article-block-text_theme-icon(
           :style="`background-image: url('/img/article-icons/${theme}.svg')`"
           :title='theme' :alt='theme' )
+      .theme-choice_icon.checked {{ getAmountArticles }}
       .theme-choice_icon.checked(@click="clickAll")  Выделить все
   #nav.wrapper(v-else)
     nuxt-link(to="/") Обо мне
@@ -20,6 +21,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Menu',
   props: {
@@ -37,6 +40,9 @@ export default {
       search: '',
       checkedThemes: []
     }
+  },
+  computed: {
+    ...mapGetters('articles', ['getAmountArticles'])
   },
   watch: {
     search() {
