@@ -29,7 +29,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'http://localhost:8080/'
+    baseURL: 'http://back:8080/'
   },
 
   manifest: {
