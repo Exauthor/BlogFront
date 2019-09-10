@@ -15,9 +15,9 @@
       .theme-choice_icon.checked {{ amountArticles }}
       .theme-choice_icon.checked(@click="clickAll")  Выделить все
   #nav.wrapper(v-else)
-    nuxt-link(to="/") Обо мне
-    nuxt-link(to="/contacts") Контакты
-    nuxt-link(to="/articles") Мой блог
+    nuxt-link(:to='{name: "about_me"}') Обо мне
+    nuxt-link(:to='{name: "contacts"}') Контакты
+    nuxt-link(:to='{name: "index"}') Мой блог
 </template>
 
 <script>

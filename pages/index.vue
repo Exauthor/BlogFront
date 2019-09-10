@@ -6,7 +6,7 @@
       @searchArticle='filterArticle'
     )
     .articles.wrapper
-      article-block(
+      ArticleBlock(
         v-for='article in articles'
         :key='article.title'
         :article='article'
@@ -35,9 +35,9 @@ export default {
     ArticleBlock
   },
   computed: {
-    ...mapState('articles', ['articles']),
     ...mapGetters('articles', {
-      themes: 'getThemes'
+      themes: 'getThemes',
+      articles: 'getArticles'
     }),
     grid() {
       return new Isotope('.articles', {
@@ -56,12 +56,11 @@ export default {
       title: 'Мой Блог'
     }
   },
-  async fetch ({ store }) {
-    return await store.dispatch('articles/getArticles')
+  async fetch({ store }) {
+    await store.dispatch('articles/getArticles')
   },
-  async mounted() {
+  mounted() {
     this.grid.layout()
-    // await this.getArticles()
   },
   updated() {
     const that = this

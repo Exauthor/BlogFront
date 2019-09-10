@@ -1,7 +1,7 @@
 <template lang="pug">
   footer
     .wrapper.footer-links
-      nuxt-link(to="/") Обо мне
+      nuxt-link(to="/about_me") Обо мне
       nuxt-link(to="/contacts") Контакты
 </template>
 
