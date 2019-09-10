@@ -6,8 +6,8 @@
    @click.stop='popUpArticle')
     .article-block_image.center(:style="`background-image: url('${article.img_src}')`")
     .article-block-text
-      nuxt-link.article-block-text_link(:to='{ name: "index", params: { id: article.id } }')
-        | {{article.title}} {{article.id}}
+      nuxt-link.article-block-text_link(:to='{ name: "article", params: { article: article.id } }')
+        | {{article.title}}
       .article-block-text_theme-icons
         .article-block-text_theme-icon(
           v-for='theme in article.themes'
@@ -21,7 +21,12 @@
 <script>
 export default {
   name: 'ArticleBlock',
-  props: ['article'],
+  props: {
+    article: {
+      type: Object,
+      default: () => Object.create(null)
+    }
+  },
   methods: {
     popUpArticle(e) {
       const classList = e.target.classList.value

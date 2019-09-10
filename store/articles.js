@@ -2,25 +2,38 @@ export const state = () => ({
   articles: [],
   filterObject: {
     title: '',
-    themes: []
+    excludedThemes: []
   }
 })
 
 export const mutations = {
   SET_ARTICLES(state, { key, value }) {
     state[key] = value
+  },
+  EXCLUDE_THEME(state, theme) {
+    state.filterObject.excludedThemes.push(theme)
+  },
+  INCLUDE_ALL_THEMES(state) {
+    state.filterObject.excludedThemes = []
+  },
+  INCLUDE_THEME(state, theme) {
+    state.filterObject.excludedThemes = state.filterObject.excludedThemes.filter(
+      (t) => t !== theme
+    )
   }
 }
 
 export const getters = {
+  isExcludeTheme: (state, getters) => (theme) => {
+    return state.filterObject.excludedThemes.includes(theme)
+  },
   getArticle: (state, getters) => (id, option = false) => {
     const articles = option ? state.allArticles : state.articles
 
-    return articles.map((item) => item.id).indexOf(id)
+    return articles.find((item) => item.id === id)
   },
   getArticles: (state, getters) => {
-    // return ['return', 'all', 'articles', 'by', 'state', 'filter', 'value']
-    return 'return all articles by state filter value'
+    return state.articles.filter((article) => !article.archive)
   },
   getThemes: (state) => {
     return Array.from(
@@ -31,36 +44,27 @@ export const getters = {
       )
     )
   },
-  getAmountArticles: (state) => {
-    return state.articles.length
+  getAmountArticles: (state, getters) => {
+    return getters.getArticles.length
   }
 }
 
 export const actions = {
-  // async nuxtServerInit({ dispatch }) {
-  //   await dispatch('search')
-  // },
-  async getArticle({ state, dispatch }, id, option = false) {
-    const articles = option ? state.allArticles : state.articles
-    const article = articles.find((article) => article.id === id)
-    console.log(`articles: ${articles}, article: ${article}`)
+  async getArticle({ state, getters, dispatch }, id, option = false) {
+    const article = getters.getArticle(id, option)
 
     if (article) {
       return article
     } else {
       await dispatch('getArticles')
-      console.log(articles, article)
-      return ['return', 'filter', 'value']
+      return getters.getArticle(id, option)
     }
   },
   async getArticles({ state, commit }) {
-    console.log('UPDATE STATE')
     if (!state.articles.length) {
       const { data } = await this.$axios.get('/articles')
-      console.log(data, 'GET FROM BACK')
 
       commit('SET_ARTICLES', { key: 'articles', value: data })
-      //     article['body'] = item.data().body.split("\\n").join("\n");
     }
   }
 }

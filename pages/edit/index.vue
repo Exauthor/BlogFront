@@ -6,7 +6,7 @@
         button(type='submit') Log In
     div(v-else-if='state === "choice"')
       h2 CHOISE
-      .body-choise 
+      .body-choise
         .body-choise_create.gradient-link
           h4(@click='createArticle') Create
         .body-choise_edit

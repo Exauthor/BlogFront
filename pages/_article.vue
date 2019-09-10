@@ -1,16 +1,19 @@
 <template lang="pug">
-  .article(v-if="article")
+  .article(v-if='article')
     ArticleBackgroundHeader(
-      :component='(article.settings) ? article.settings.background_header_component : undefined')
+      :component='(article.settings) ? article.settings.background_header_component : undefined'
+    )
     .article-body
       .article-title-block
-        router-link(to="/articles" class="article-back")
+        router-link(:to='{ name: "index"}' class='article-back')
         h1.article-title {{ article.title }}
         .article-block-text_theme-icons
-          div(v-for="theme in article.themes"
-            :style="`background-image: url('/img/article-icons/${theme}.svg')`"
-            :title="theme"
-            class="article-block-text_theme-icon")
+          div(
+            v-for='theme in article.themes'
+            :style='`background-image: url("/img/article-icons/${theme}.svg")`'
+            :title='theme'
+            class='article-block-text_theme-icon'
+          )
       .article-body
         .article-body_description {{article.description}}
         vue-markdown(:source='article.body')
@@ -27,8 +30,7 @@ export default {
     ArticleBackgroundHeader
   },
   async asyncData({ params, store }) {
-    const article = await store.dispatch('articles/getArticle')
-    console.log(article)
+    const article = await store.dispatch('articles/getArticle', params.article)
     return { article }
   },
   layout: 'article',
