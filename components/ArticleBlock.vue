@@ -1,13 +1,13 @@
 <template lang="pug">
   div(
-   v-if='article' 
+   v-if='article'
    :class='`article-block article-block-width-${article.size[0]} article-block-height-${article.size[1]}`'
    :data-size='`${article.size}`'
    @click.stop='popUpArticle')
     .article-block_image.center(:style="`background-image: url('${article.img_src}')`")
     .article-block-text
-      nuxt-link.article-block-text_link(:to="{ name: 'articles-id', params: { id: article.id } }")
-        | {{article.title}}
+      nuxt-link.article-block-text_link(:to='{ name: "index", params: { id: article.id } }')
+        | {{article.title}} {{article.id}}
       .article-block-text_theme-icons
         .article-block-text_theme-icon(
           v-for='theme in article.themes'
@@ -15,7 +15,7 @@
           :title='theme')
       .article-block-text_description(v-if='article.description')
         | {{article.description}}
-      .article-block-text_description(v-else='')
+      .article-block-text_description(v-else)
 </template>
 
 <script>

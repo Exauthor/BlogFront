@@ -7,15 +7,19 @@
       .another-planet
       .hole
       h2.welcome.center-position Добро Пожаловать
+    section.diagram
+      h2 Диаграмма знаний
     section.about-me
       .fire
       h2 Приветик, я космический огонек.
-    //Diagram
 </template>
 
 <script>
-import Diagram from '../components/About/Diagram.vue'
+import * as d3 from 'd3'
 
+import { mapState } from 'vuex'
+import Diagram from '../components/About/Diagram.vue'
+import Fire from '../components/About/Fire.vue'
 let exp
 
 if (process.browser) {
@@ -30,6 +34,10 @@ if (process.browser) {
       }
     },
     computed: {
+      ...mapState('structure', ['diagram']),
+      mainSlidesCount() {
+        return this.$el.childNodes.length
+      },
       mainSlides() {
         const index = this.currentPositionBlockIndex
         return Array.from(
@@ -42,6 +50,116 @@ if (process.browser) {
       }
     },
     methods: {
+      initBubble() {
+        const data = this.diagram
+
+        let drag = (simulation) => {
+          function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+            d.fx = d.x
+            d.fy = d.y
+          }
+
+          function dragged(d) {
+            d.fx = d3.event.x
+            d.fy = d3.event.y
+          }
+
+          function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0)
+            drag = false
+            d.fx = null
+            d.fy = null
+          }
+
+          return d3
+            .drag()
+            .on('start', dragstarted)
+            .on('drag', dragged)
+            .on('end', dragended)
+        }
+        const height = document.documentElement.clientHeight - 100
+        const width = document.documentElement.clientWidth
+        const min = height > width ? width : height
+        const svg = d3
+          .select('.diagram')
+          .append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .append('g')
+          .attr('transform', `translate(${width / 2}, ${height / 2})`)
+
+        const maxSize = (min / 100) * 20
+        const radiusScale = d3
+          .scaleSqrt()
+          .domain([10, 100])
+          .range([maxSize / 6, maxSize])
+
+        const simulations = d3
+          .forceSimulation()
+          .force('x', d3.forceX(0).strength(0.05))
+          .force('y', d3.forceY(0).strength(0.05))
+          .force('collide', d3.forceCollide((d) => radiusScale(d.value) + 3))
+
+        const groups = svg
+          .selectAll('g.circle')
+          .data(data)
+          .enter()
+          .append('g')
+          .call(drag(simulations))
+          .attr('class', 'circle-30')
+        // .on('click', (d,i) => {
+        // console.log('CLICK', d, i);
+
+        // d.vx = Math.random() * 300 + 50;
+        // d.vy = Math.random() * 300 + 50;
+
+        /// /data[14].fx = Math.random() * 300 + 50;
+        /// /data[14].fy = Math.random() * 300 + 50;
+
+        // simulations.alphaTarget(0.3).restart()
+        // });
+
+        const circles = groups
+          .append('circle')
+          .attr('r', (d) => radiusScale(d.value))
+          .attr('data-title', (d) => d.title)
+          .attr('fill', (d) => `rgba(0,0,0,.4)`)
+
+        const images = groups
+          .append('image')
+          .attr('x', (d) => -radiusScale(d.value) * 0.7)
+          .attr('y', (d) => -radiusScale(d.value) * 0.7)
+          .attr('width', (d) => radiusScale(d.value) * 2 * 0.7)
+          .attr('height', (d) => radiusScale(d.value) * 2 * 0.7)
+          .attr('xlink:href', (d) =>
+            d.img ? d.img.url : '/img/article-photo/docker.svg'
+          )
+
+        // setInterval(() => {
+        // data[14].fx = Math.random() * 300 + 50;
+        // data[14].fy = Math.random() * 300 + 50;
+
+        // simulations.alphaTarget(0.3).restart()
+        // }, 1000)
+
+        // let text = groups.selectAll('text')
+        // .data(d => [d])
+        // .enter()
+        // .append('text')
+        // .attr('class', 'circle-30')
+        // .attr('x', '-20')
+        // .attr('y', d => -d.value * .5)
+        // .text(d => d.title);
+
+        simulations.nodes(data).on('tick', ticked)
+
+        function ticked() {
+          groups.attr('style', (d, i) => {
+            return `transform: translate(${d.x}px, ${d.y}px)`
+          })
+        }
+      },
       resizeWindow() {
         document.querySelector(
           'section.about-me .meteor'
@@ -178,10 +296,13 @@ if (process.browser) {
           '#text'
         ]
 
-        if (textArr.includes(originalElement.nodeName)) {
+        if (
+          textArr.includes(originalElement.nodeName) ||
+          e.path.filter((node) => node.nodeName === 'svg').length
+        ) {
           return
         }
-        // if (e.explicitOriginalTarget || e.explicitOriginalTarget.nodeName === "#text") {return;}
+
         this.clickObj = [e.clientX, e.clientY]
         e.preventDefault()
       },
@@ -224,34 +345,42 @@ if (process.browser) {
       },
 
       initSizeBlocks() {
-        window.app.childNodes.forEach(function(item) {
+        document.querySelectorAll('#app > *').forEach((item) => {
           item.style.height = document.documentElement.clientHeight + 'px'
         })
       }
     },
     mounted() {
-      this.mainSlidesCount = 3
-      // this.mainSlidesCount = window["app"].childElementCount
-      // console.log(this)
-      // this.initSizeBlocks();
+      this.initSizeBlocks()
+      this.initBubble()
       this.resizeWindow()
     },
     created() {
       // PHONE
-      window.addEventListener('touchstart', this.catchTouchstart)
-      window.addEventListener('touchmove', this.catchTouchmove)
-      window.addEventListener('touchend', this.catchTouchend)
+      window.addEventListener('touchstart', this.catchTouchstart, {
+        passive: false
+      })
+      window.addEventListener('touchmove', this.catchTouchmove, {
+        passive: false
+      })
+      window.addEventListener('touchend', this.catchTouchend, {
+        passive: false
+      })
 
       // DESKTOP
-      window.addEventListener('wheel', this.catchWheel)
-      window.addEventListener('keydown', this.catchKeydown)
+      window.addEventListener('wheel', this.catchWheel, { passive: false })
+      window.addEventListener('keydown', this.catchKeydown, { passive: false })
 
       // DRUG&DROP
-      window.addEventListener('mousedown', this.catchClickstart)
-      window.addEventListener('mousemove', this.catchClickmove)
-      window.addEventListener('mouseup', this.catchClickend)
+      window.addEventListener('mousedown', this.catchClickstart, {
+        passive: false
+      })
+      window.addEventListener('mousemove', this.catchClickmove, {
+        passive: false
+      })
+      window.addEventListener('mouseup', this.catchClickend, { passive: false })
 
-      window.addEventListener('resize', this.initSizeBlocks)
+      window.addEventListener('resize', this.initSizeBlocks, { passive: false })
     },
     destroyed() {
       // PHONE
@@ -273,8 +402,14 @@ if (process.browser) {
     metaInfo() {
       return {
         title: 'Обо Мне',
-        description:
-          'Я программист самоучка, в этом блогу пишу о том, что знаю и делюсь тем, что выучил.'
+        meta: [
+          {
+            vmid: 'description',
+            name: 'description',
+            content:
+              'Я программист и в этом блоге пишу о том, что знаю и делюсь тем, что выучил.'
+          }
+        ]
       }
     }
   }
@@ -283,85 +418,8 @@ if (process.browser) {
 export default {
   ...exp,
   components: {
-    Diagram
+    Diagram,
+    Fire
   }
 }
 </script>
-
-<style lang="stylus">
-
-#app
-  height 100%
-  width 100vw
-  position fixed
-
-section.about-me
-  overflow hidden
-  width 100vw;
-  min-height 100vh
-
-h2.welcome
-  display flex
-  justify-content center
-  align-items center
-  width 50vmin
-  height 50vmin
-  border-radius 50%
-  background rgba(0,0,0,.6)
-  box-shadow 0px 0px 50px inset var(--color-mainbg)
-  text-align center
-  margin 0px auto
-  font-size 6vmin
-  color var(--color-blue-light)
-  filter drop-shadow( 0px 0px 5px var(--color-blue-light))
-  &:before
-    display none
-
-.main-planet
-  width 80vmin
-  height 80vmin
-  background url("/img/svg/MainPlanet.svg") center/contain no-repeat
-  transform: translate(-45.5%, -47.5%);
-
-.ufo
-  width 25vmin
-  height 25vmin
-  position absolute
-  top 5vh
-  left 5vw
-  background url("/img/svg/UFO.svg") center/contain no-repeat
-  transform rotate(-25deg)
-
-.meteor
-  width 25vmin
-  height 25vmin
-  position absolute
-  top 3vh
-  right 3vw
-  background url("/img/article-photo/meteor.svg") center/contain no-repeat
-
-
-.another-planet
-  width 50vmin
-  height 50vmin
-  position absolute
-  bottom -2vh
-  left -6vw
-  background url("/img/svg/LeftBottomPlanet.svg") center/contain no-repeat
-
-.hole
-  width 23vmin
-  height 23vmin
-  position absolute
-  bottom 6vw
-  right 1vw
-  transform rotate(25deg)
-  filter drop-shadow(0 0 1vmin #ff1c76)
-  background url("/img/svg/hole.svg") center/contain no-repeat
-
-.fire
-  width 60vmin
-  height 60vmin
-  margin 20px auto
-  background url('/img/svg/fire.svg') no-repeat center/contain
-</style>

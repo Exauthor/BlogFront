@@ -7,11 +7,11 @@
         router-link(to="/articles" class="article-back")
         h1.article-title {{ article.title }}
         .article-block-text_theme-icons
-          div(v-for="theme in article.themes" 
-            :style="`background-image: url('/img/article-icons/${theme}.svg')`" 
-            :title="theme" 
+          div(v-for="theme in article.themes"
+            :style="`background-image: url('/img/article-icons/${theme}.svg')`"
+            :title="theme"
             class="article-block-text_theme-icon")
-      .article-body 
+      .article-body
         .article-body_description {{article.description}}
         vue-markdown(:source='article.body')
 </template>
@@ -20,22 +20,17 @@
 import VueMarkdown from 'vue-markdown'
 import ArticleBackgroundHeader from '~/components/Article/BackgroundHeader.vue'
 
-// if (process.browser) {
-// var Prism = require('prismjs/prism')
-// }
-// console.log(Prism)
-
 export default {
   name: 'Article',
   components: {
     VueMarkdown,
     ArticleBackgroundHeader
   },
-  // asyncData({ params, store }) {
-  //   return {
-  //     article: store.getters.getArticle(params.id)
-  //   }
-  // },
+  async asyncData({ params, store }) {
+    const article = await store.dispatch('articles/getArticle')
+    console.log(article)
+    return { article }
+  },
   layout: 'article',
   metaInfo() {
     return {

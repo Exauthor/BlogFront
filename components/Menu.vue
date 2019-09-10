@@ -1,6 +1,6 @@
 <template lang="pug">
   #nav.wrapper(v-if="type=='search'")
-    nuxt-link(to="/articles") Мой блог
+    NuxtLink(:to='{ name: "index" }') Мой блог
     input.article-search(type="text" placeholder="Поиск" @input='inputSearch')
     .theme-choice
       .theme-choice_icon(
@@ -12,7 +12,7 @@
         .article-block-text_theme-icon(
           :style="`background-image: url('/img/article-icons/${theme}.svg')`"
           :title='theme' :alt='theme' )
-      .theme-choice_icon.checked {{ getAmountArticles }}
+      .theme-choice_icon.checked {{ amountArticles }}
       .theme-choice_icon.checked(@click="clickAll")  Выделить все
   #nav.wrapper(v-else)
     nuxt-link(to="/") Обо мне
@@ -29,10 +29,6 @@ export default {
     type: {
       type: String,
       default: 'default'
-    },
-    themes: {
-      type: Array,
-      default: () => null
     }
   },
   data() {
@@ -42,7 +38,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('articles', ['getAmountArticles'])
+    ...mapGetters('articles', {
+      themes: 'getThemes',
+      amountArticles: 'getAmountArticles'
+    })
   },
   watch: {
     search() {

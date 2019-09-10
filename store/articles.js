@@ -1,6 +1,5 @@
 export const state = () => ({
   articles: [],
-  allArticles: [],
   filterObject: {
     title: '',
     themes: []
@@ -20,7 +19,8 @@ export const getters = {
     return articles.map((item) => item.id).indexOf(id)
   },
   getArticles: (state, getters) => {
-    return ['return', 'all', 'articles', 'by', 'state', 'filter', 'value']
+    // return ['return', 'all', 'articles', 'by', 'state', 'filter', 'value']
+    return 'return all articles by state filter value'
   },
   getThemes: (state) => {
     return Array.from(
@@ -40,28 +40,27 @@ export const actions = {
   // async nuxtServerInit({ dispatch }) {
   //   await dispatch('search')
   // },
+  async getArticle({ state, dispatch }, id, option = false) {
+    const articles = option ? state.allArticles : state.articles
+    const article = articles.find((article) => article.id === id)
+    console.log(`articles: ${articles}, article: ${article}`)
+
+    if (article) {
+      return article
+    } else {
+      await dispatch('getArticles')
+      console.log(articles, article)
+      return ['return', 'filter', 'value']
+    }
+  },
   async getArticles({ state, commit }) {
     console.log('UPDATE STATE')
     if (!state.articles.length) {
-      const answer = await this.$axios.get('/articles')
-      const allArticles = answer.data
-      const articles = allArticles.filter((article) => {
-        return article.archive !== true
-      })
+      const { data } = await this.$axios.get('/articles')
+      console.log(data, 'GET FROM BACK')
 
-      commit('SET_ARTICLES', { key: 'articles', value: articles })
-      commit('SET_ARTICLES', { key: 'allArticles', value: allArticles })
-
-      // col = await db.collection('articles').get();
-      // col.forEach(item => {
-      //     var article = item.data();
+      commit('SET_ARTICLES', { key: 'articles', value: data })
       //     article['body'] = item.data().body.split("\\n").join("\n");
-      //     article['id'] = item.id;
-      //     if (article.archive !== true) {
-      //     articles.push(article);
-      //     }
-      //     all.push(article);
-      // })
     }
   }
 }
