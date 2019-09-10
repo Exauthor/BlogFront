@@ -1,26 +1,23 @@
-@media screen and (min-width: 1300px)
+@media screen and (max-aspect-ratio: 16/8)
   body
-    --size-article-block: 40vmin 
+    --size-article-block: 35vmin
   body .wrapper
     width calc(var(--size-article-block) * 4)
 
 @media screen and (max-aspect-ratio: 16/10)
   body
-    --size-article-block: 60vmin 
+    --size-article-block: 40vmin
   body .wrapper
-    width calc(var(--size-article-block) * 2)
+    width calc(var(--size-article-block) * 3)
 
 @media screen and (max-aspect-ratio: 16/12)
   body
-    --size-article-block: 50vmin 
+    --size-article-block: 45vmin
+  body .wrapper
+    width calc(var(--size-article-block) * 2)
 
-@media screen and (max-aspect-ratio: 16/14)
+@media screen and (max-aspect-ratio: 16/17)
   body
-    --size-article-block: 40vmin 
-
-@media screen and (max-aspect-ratio: 16/17) and (max-width: 700px)
+    --size-article-block: 90vmin
   body .wrapper
     width calc(var(--size-article-block) * 1)
-
-  body
-    --size-article-block: 90vmin 
