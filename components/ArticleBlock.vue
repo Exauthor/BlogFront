@@ -62,10 +62,11 @@ export default {
 
 .article-block
   border-radius 10px
-  position relative
+  position absolute
   color var(--color-active)
   overflow hidden
   background-color #241939
+  transition 1s all
   & .article-block-text_theme-icons
     transition .5s opacity, .5s margin
   &[data-size^='1'] //1x?

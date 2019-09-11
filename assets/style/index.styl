@@ -14,7 +14,7 @@ section
   & h2
     margin 0px
 
-html 
+html
   font-family 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-size 16px
@@ -40,8 +40,9 @@ html
   --color-active #04ded4
   --color-bg #19102E
   --color-green #91e60a
-  --size-article-block 50vmin 
-  --count-article-block 3 
+  --size-article-block 50vmin
+  --min-size-article-block calc(var(--size-article-block) / 2)
+  --count-article-block 3
   --text-font forText
 
 body
@@ -61,7 +62,7 @@ ul li
 h1, h2, h3, h4, h5, h6
   font-family forBigTitle, sans
 
-h2 
+h2
   font 7vmin forBigTitle, sans
   margin 10px
   text-align center
@@ -98,10 +99,23 @@ a
   animation-delay: .4s;
   opacity: 0;
 
-.router-anim-leave-active 
+.router-anim-leave-active
   animation going .4s
 
-.container 
+.list-item
+  display inline-block
+  margin-right 10px
+
+.list-enter-active, .list-leave-active
+  transition all 1s
+
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */
+  opacity 0
+  transform translateY(30px)
+
+
+
+.container
   margin 0 auto
   min-height 100vh
 

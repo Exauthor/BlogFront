@@ -33,7 +33,16 @@ export const getters = {
     return articles.find((item) => item.id === id)
   },
   getArticles: (state, getters) => {
-    return state.articles.filter((article) => !article.archive)
+    const excludedThemes = state.filterObject.excludedThemes
+    let articles = state.articles.filter((article) => !article.archive)
+
+    articles = articles.filter((article) => {
+      const sumLength = excludedThemes.length + article.themes.length
+      const set = new Set(article.themes.concat(excludedThemes))
+      return set.size === sumLength
+    })
+
+    return articles
   },
   getThemes: (state) => {
     return Array.from(
