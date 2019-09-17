@@ -21,7 +21,7 @@
 
 <script>
 import VueMarkdown from 'vue-markdown'
-import ArticleBackgroundHeader from '~/components/Article/BackgroundHeader.vue'
+import ArticleBackgroundHeader from '~/components/article/BackgroundHeader.vue'
 
 export default {
   name: 'Article',

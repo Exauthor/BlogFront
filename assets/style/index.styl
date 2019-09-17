@@ -41,8 +41,7 @@ html
   --color-bg #19102E
   --color-green #91e60a
   --size-article-block 50vmin
-  --min-size-article-block calc(var(--size-article-block) / 2)
-  --count-article-block 3
+  --amount-article-blocks 3
   --text-font forText
 
 body
@@ -91,7 +90,7 @@ a
   transform translate(-50%, -50%)
 
 .wrapper
-  width calc(var(--size-article-block) * 3)
+  width calc(var(--size-article-block) * var(--amount-article-blocks))
   margin 0 auto
 
 .router-anim-enter-active

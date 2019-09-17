@@ -14,14 +14,14 @@ import ThemesSelector from '@/components/common/header/ThemesSelector'
 
 export default {
   name: 'Menu',
+  components: {
+    ThemesSelector
+  },
   props: {
     type: {
       type: String,
       default: 'default'
     }
-  },
-  components: {
-    ThemesSelector
   }
 }
 </script>
