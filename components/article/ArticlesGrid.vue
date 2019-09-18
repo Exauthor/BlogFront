@@ -50,62 +50,69 @@ export default {
     },
     generateGrid() {
       const articles = this.articles
-      const gridObject = {}
+      let gridObject = {}
 
-      Array.from(Array(this.amountColumns)).forEach((item, index) => {
-        gridObject['column_' + (index + 1)] = []
-      })
-
-      articles.forEach((article, index) => {
-        this.putBlockInGrid(gridObject, article)
-      })
+      gridObject = this.putBlockInGrid(gridObject, articles[0])
 
       console.log(gridObject)
-      // console.log(this.articles, 'FROM GENERATE')
     },
     putBlockInGrid(grid, article) {
+      let isInGrid = false
       const size = article.size
       const rows = Object.keys(grid).filter((key) => {
         return key.includes('row')
       })
+
       const getPlaceForBlockInRow = (size) => {
-        const findingBlocks = rows
-          .map((row) => {
-            let space = 0
-            let maxSpace = row.length
-            console.log(row)
+        let hasEmpty = false
+        rows.forEach((row, i) => {
+          let space = 0
+          let maxSpace = 0
 
-            grid[row].forEach((item) => {
-              if (item === null) {
-                space++
-              } else {
-                maxSpace = space > maxSpace ? space : maxSpace
-                space = 0
-              }
-            })
-
-            const answerObj = {
-              maxSpace,
-              row
+          grid[row].forEach((item) => {
+            if (item === null) {
+              space++
+            } else {
+              maxSpace = space > maxSpace ? space : maxSpace
+              space = 0
             }
-
-            console.log(answerObj)
-
-            return maxSpace > parseInt(size[0]) ? answerObj : false
           })
-          .filter(Boolean)
 
-        console.log(findingBlocks)
-        return false
+          const answerObj = {
+            maxSpace,
+            row
+          }
+
+          if (maxSpace > parseInt(size[0])) {
+            hasEmpty = true
+          }
+        })
+
+        return hasEmpty
+      }
+
+      const putInEmpty = () => {
+        rows.forEach((row) => {
+          grid[row].forEach((item, i, row) => {
+            if (!isInGrid && !row.slice(i, i + size[0]).some(Boolean)) {
+              const x = parseInt(size[0])
+              isInGrid = true
+              Array.from(Array(x)).forEach((v, j) => {
+                grid[`row_${i + 1}`][j] = article
+              })
+            }
+          })
+        })
       }
 
       if (!getPlaceForBlockInRow(size)) {
         const rowValues = Array.from(Array(this.amountColumns)).map((d) => null)
-        rows.push = rowValues
+        rows.push('row_' + (rows.length + 1))
         grid['row_' + rows.length] = rowValues
+        putInEmpty()
       }
 
-      // console.log(grid, rows, size)
+      return grid
     }
   }
 }
