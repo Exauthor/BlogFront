@@ -1,9 +1,9 @@
 <template lang="pug">
-  .articles.wrapper
+  .articles.wrapper(ref='grid')
     transition-group(tag='div' name='list')
       ArticleBlock(
-        v-for='(article, i) in articles'
-        :style='`transform: translateY(${getPositionValueFromString(minBlockSize, i)});`'
+        v-for='(article, i) in positionedArticles'
+        :style='`transform: translate(${article.x}, ${article.y});`'
         :key='article.title'
         :article='article'
       )
@@ -21,14 +21,28 @@ export default {
   data() {
     return {
       minBlockSize: '0',
-      amountColumns: 0
+      amountColumns: 0,
+      grid: {}
     }
   },
   computed: {
     ...mapGetters(['getCSSVariable']),
     ...mapGetters('articles', {
       articles: 'getArticles'
-    })
+    }),
+    positionedArticles() {
+      const articles = Object.values(this.grid)
+        .flat()
+        .filter(Boolean)
+        .map((value) => JSON.stringify(value))
+
+      const enique = [...new Set(articles)].map(JSON.parse)
+      return enique
+    }
+  },
+  updated() {
+    this.generateGrid()
+    this.determinaHeight()
   },
   mounted() {
     this.minBlockSize = this.getPositionValueFromString(
@@ -37,28 +51,57 @@ export default {
     )
 
     this.amountColumns =
-      parseInt(this.getCSSVariable('--amount-article-blocks')) * 2
+      parseFloat(this.getCSSVariable('--amount-article-blocks')) * 2
 
     this.generateGrid()
+    this.determinaHeight()
   },
   methods: {
     getPositionValueFromString(size, multiplier) {
-      const number = parseInt(size)
+      const number = parseFloat(size)
       const measure = size.trim().slice(('' + number).length)
 
       return number * multiplier + measure
+    },
+    determinaHeight() {
+      this.$refs.grid.style.height = this.getPositionValueFromString(
+        this.minBlockSize,
+        Object.keys(this.grid).length
+      )
     },
     generateGrid() {
       const articles = this.articles
       let gridObject = {}
 
-      gridObject = this.putBlockInGrid(gridObject, articles[0])
+      articles.forEach((article, index) => {
+        gridObject = this.putBlockInGrid(gridObject, article)
+      })
 
-      console.log(gridObject)
+      gridObject = this.generatePosition(gridObject)
+
+      this.grid = gridObject
+    },
+    generatePosition(grid) {
+      const rows = Object.keys(grid).filter((key) => {
+        return key.includes('row')
+      })
+      rows.forEach((rowTitle, y) => {
+        grid[rowTitle].forEach((article, x) => {
+          if (
+            article !== null &&
+            article.x === undefined &&
+            article.y === undefined
+          ) {
+            article.x = this.getPositionValueFromString(this.minBlockSize, x)
+            article.y = this.getPositionValueFromString(this.minBlockSize, y)
+          }
+        })
+      })
+      return grid
     },
     putBlockInGrid(grid, article) {
       let isInGrid = false
-      const size = article.size
+      const size = article.size.map(Number)
       const rows = Object.keys(grid).filter((key) => {
         return key.includes('row')
       })
@@ -73,17 +116,12 @@ export default {
             if (item === null) {
               space++
             } else {
-              maxSpace = space > maxSpace ? space : maxSpace
               space = 0
             }
+            maxSpace = space > maxSpace ? space : maxSpace
           })
 
-          const answerObj = {
-            maxSpace,
-            row
-          }
-
-          if (maxSpace > parseInt(size[0])) {
+          if (maxSpace >= size[0]) {
             hasEmpty = true
           }
         })
@@ -92,13 +130,13 @@ export default {
       }
 
       const putInEmpty = () => {
-        rows.forEach((row) => {
-          grid[row].forEach((item, i, row) => {
-            if (!isInGrid && !row.slice(i, i + size[0]).some(Boolean)) {
-              const x = parseInt(size[0])
+        rows.forEach((rowKey) => {
+          grid[rowKey].forEach((item, i, row) => {
+            const array = row.slice(i, i + size[0])
+            if (!isInGrid && array.length >= size[0] && !array.some(Boolean)) {
               isInGrid = true
-              Array.from(Array(x)).forEach((v, j) => {
-                grid[`row_${i + 1}`][j] = article
+              Array.from(Array(size[0])).forEach((v, j) => {
+                grid[rowKey][i + j] = article
               })
             }
           })
@@ -109,8 +147,8 @@ export default {
         const rowValues = Array.from(Array(this.amountColumns)).map((d) => null)
         rows.push('row_' + (rows.length + 1))
         grid['row_' + rows.length] = rowValues
-        putInEmpty()
       }
+      putInEmpty()
 
       return grid
     }
