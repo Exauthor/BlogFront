@@ -3,7 +3,7 @@
     transition-group(tag='div' name='list')
       ArticleBlock(
         v-for='(article, i) in positionedArticles'
-        :style='`transform: translate(${article.x}, ${article.y});`'
+        :style='`transform: translate(${article.x}, ${article.y})`'
         :key='article.title'
         :article='article'
       )
@@ -41,8 +41,16 @@ export default {
     }
   },
   updated() {
-    this.generateGrid()
-    this.determinaHeight()
+    console.log('updated')
+    // this.generateGrid()
+    // this.determinaHeight()
+  },
+  watch: {
+    articles() {
+      this.clearPosition()
+      this.generateGrid()
+      this.determinaHeight()
+    }
   },
   mounted() {
     this.minBlockSize = this.getPositionValueFromString(
@@ -62,6 +70,14 @@ export default {
       const measure = size.trim().slice(('' + number).length)
 
       return number * multiplier + measure
+    },
+    clearPosition() {
+      this.articles.map((article) => {
+        article.x = undefined
+        article.y = undefined
+
+        return article
+      })
     },
     determinaHeight() {
       this.$refs.grid.style.height = this.getPositionValueFromString(
