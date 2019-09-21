@@ -1,7 +1,7 @@
 <template lang="pug">
   #nav.wrapper(v-if="type=='search'")
-    NuxtLink(:to='{ name: "index" }') Мой блог
-    input.article-search(type="text" placeholder="Поиск")
+    NuxtLink(:to='{name: "index"}') Мой блог
+    input.article-search(type="text" placeholder="Поиск" @input='handleInput')
     ThemesSelector
   #nav.wrapper(v-else)
     nuxt-link(:to='{name: "about_me"}') Обо мне
@@ -21,6 +21,12 @@ export default {
     type: {
       type: String,
       default: 'default'
+    }
+  },
+  methods: {
+    handleInput(e) {
+      const text = e.target.value
+      console.log(text)
     }
   }
 }

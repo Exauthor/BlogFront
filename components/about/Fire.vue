@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: 'AboutMe',
+  name: 'Fire',
   props: {
     colors: {},
     active: {

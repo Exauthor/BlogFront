@@ -18,13 +18,13 @@
 import * as d3 from 'd3'
 
 import { mapState } from 'vuex'
-import Diagram from '../components/About/Diagram.vue'
-import Fire from '../components/About/Fire.vue'
+import Diagram from '../components/about/Diagram.vue'
+import Fire from '../components/about/Fire.vue'
 let exp
 
 if (process.browser) {
   exp = {
-    name: 'About',
+    name: 'AboutPage',
     data() {
       return {
         transformAnimate: false,

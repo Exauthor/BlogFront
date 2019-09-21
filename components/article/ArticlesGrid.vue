@@ -1,12 +1,17 @@
 <template lang="pug">
-  .articles.wrapper(ref='grid')
+  .articles.wrapper(ref='grid' style='position: relative;')
     transition-group(tag='div' name='list')
-      ArticleBlock(
+      div(
+        class='transition-block'
         v-for='(article, i) in positionedArticles'
-        :style='`transform: translate(${article.x}, ${article.y})`'
+        :style='`top: ${article.y || "0px"}; left: ${article.x || "0px"};`'
         :key='article.title'
-        :article='article'
       )
+        ArticleBlock(
+          :article='article'
+        )
+        // :style='`top: ${article.y || "0px"}; left: ${article.x || "0px"};`'
+        // :style='`transform: translate(${article.x || "0px"}, ${article.y || "0px"});`'
 </template>
 
 <script>
@@ -34,22 +39,15 @@ export default {
       const articles = Object.values(this.grid)
         .flat()
         .filter(Boolean)
-        .map((value) => JSON.stringify(value))
+        .map(JSON.stringify)
 
       const enique = [...new Set(articles)].map(JSON.parse)
       return enique
     }
   },
-  updated() {
-    console.log('updated')
-    // this.generateGrid()
-    // this.determinaHeight()
-  },
   watch: {
     articles() {
-      this.clearPosition()
-      this.generateGrid()
-      this.determinaHeight()
+      this.updateAll()
     }
   },
   mounted() {
@@ -65,6 +63,11 @@ export default {
     this.determinaHeight()
   },
   methods: {
+    updateAll() {
+      this.clearPosition()
+      this.generateGrid()
+      this.determinaHeight()
+    },
     getPositionValueFromString(size, multiplier) {
       const number = parseFloat(size)
       const measure = size.trim().slice(('' + number).length)
@@ -73,8 +76,8 @@ export default {
     },
     clearPosition() {
       this.articles.map((article) => {
-        article.x = undefined
-        article.y = undefined
+        article.x = 0
+        article.y = 0
 
         return article
       })
@@ -98,16 +101,11 @@ export default {
       this.grid = gridObject
     },
     generatePosition(grid) {
-      const rows = Object.keys(grid).filter((key) => {
-        return key.includes('row')
-      })
+      const rows = Object.keys(grid)
+
       rows.forEach((rowTitle, y) => {
         grid[rowTitle].forEach((article, x) => {
-          if (
-            article !== null &&
-            article.x === undefined &&
-            article.y === undefined
-          ) {
+          if (article !== null && !article.x && !article.y) {
             article.x = this.getPositionValueFromString(this.minBlockSize, x)
             article.y = this.getPositionValueFromString(this.minBlockSize, y)
           }
@@ -118,9 +116,7 @@ export default {
     putBlockInGrid(grid, article) {
       let isInGrid = false
       const size = article.size.map(Number)
-      const rows = Object.keys(grid).filter((key) => {
-        return key.includes('row')
-      })
+      const rows = Object.keys(grid)
 
       const getPlaceForBlockInRow = (size) => {
         let hasEmpty = false
@@ -145,14 +141,26 @@ export default {
         return hasEmpty
       }
 
+      const addRow = () => {
+        const rowValues = Array.from(Array(this.amountColumns)).map((d) => null)
+        rows.push('row_' + (rows.length + 1))
+        grid['row_' + rows.length] = rowValues
+      }
+
       const putInEmpty = () => {
-        rows.forEach((rowKey) => {
+        rows.forEach((rowKey, rowIndex) => {
           grid[rowKey].forEach((item, i, row) => {
             const array = row.slice(i, i + size[0])
             if (!isInGrid && array.length >= size[0] && !array.some(Boolean)) {
               isInGrid = true
               Array.from(Array(size[0])).forEach((v, j) => {
                 grid[rowKey][i + j] = article
+                if (size[1] > 1) {
+                  if (grid[`row_${rowIndex + 2}`] === undefined) {
+                    addRow()
+                  }
+                  grid[`row_${rowIndex + 2}`][i + j] = article
+                }
               })
             }
           })
@@ -160,9 +168,7 @@ export default {
       }
 
       if (!getPlaceForBlockInRow(size)) {
-        const rowValues = Array.from(Array(this.amountColumns)).map((d) => null)
-        rows.push('row_' + (rows.length + 1))
-        grid['row_' + rows.length] = rowValues
+        addRow()
       }
       putInEmpty()
 
@@ -173,6 +179,10 @@ export default {
 </script>
 
 <style lang="stylus">
+.transition-block
+  transition .6s
+  position absolute
+
 .articles
   margin 10px auto
 </style>
