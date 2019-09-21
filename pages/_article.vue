@@ -56,8 +56,6 @@ export default {
   methods: {
     onLoad() {
       this.$prism()
-      // Prism.highlightAll();
-      // this.setNatifications();
       this.linkScroll()
     },
     setNatifications() {

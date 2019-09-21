@@ -1,7 +1,7 @@
 export const state = () => ({
   articles: [],
   filterObject: {
-    title: '',
+    search: '',
     excludedThemes: []
   }
 })
@@ -9,6 +9,9 @@ export const state = () => ({
 export const mutations = {
   SET_ARTICLES(state, { key, value }) {
     state[key] = value
+  },
+  SET_SEARCH(state, value) {
+    state.filterObject.search = value
   },
   EXCLUDE_THEME(state, theme) {
     state.filterObject.excludedThemes.push(theme)
@@ -33,13 +36,19 @@ export const getters = {
     return articles.find((item) => item.id === id)
   },
   getArticles: (state, getters) => {
-    const excludedThemes = state.filterObject.excludedThemes
     let articles = state.articles.filter((article) => !article.archive)
+    const excludedThemes = state.filterObject.excludedThemes
 
     articles = articles.filter((article) => {
       const sumLength = excludedThemes.length + article.themes.length
       const set = new Set(article.themes.concat(excludedThemes))
-      return set.size === sumLength
+      const matchSearch = state.filterObject.search
+        ? article.title
+            .toLowerCase()
+            .includes(state.filterObject.search.toLowerCase())
+        : true
+
+      return set.size === sumLength && matchSearch
     })
 
     return articles
@@ -65,8 +74,11 @@ export const actions = {
     if (article) {
       return article
     } else {
-      await dispatch('getArticles')
-      return getters.getArticle(id, option)
+      const { data } = await this.$axios.get('/articles/' + id)
+      console.log(`GET FROM STORE ID: ${id} INFO: ${data}`)
+      return data[0]
+      // await dispatch('getArticles')
+      // return getters.getArticle(id, option)
     }
   },
   async getArticles({ state, commit }) {
@@ -75,5 +87,13 @@ export const actions = {
 
       commit('SET_ARTICLES', { key: 'articles', value: data })
     }
+  },
+  async createArticle({ state }, article) {
+    await this.$axios.post('http://localhost:8080/articles/', article)
+  },
+  async deleteArticle({ state }, id) {
+    await this.$axios.delete('http://localhost:8080/articles/', {
+      data: { id }
+    })
   }
 }

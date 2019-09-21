@@ -1,13 +1,15 @@
 <template lang="pug">
   div(
-   v-if='article'
-   :class='`article-block article-block-width-${article.size[0]} article-block-height-${article.size[1]}`'
-   :data-size='`${article.size}`'
-   @click.stop='popUpArticle')
+    v-if='article'
+    :class='`article-block article-block-width-${article.size[0]} article-block-height-${article.size[1]}`'
+    :data-size='`${article.size}`'
+    @click.stop='popUpArticle'
+  )
     .article-block_image.center(:style="`background-image: url('${article.img_src}')`")
     .article-block-text
-      nuxt-link.article-block-text_link(:to='{ name: "article", params: { article: article.id } }')
-        | {{article.title}}
+      nuxt-link.article-block-text_link(
+        :to='{ name: "article", params: { article: article.id } }'
+      ) {{article.title}}
       .article-block-text_theme-icons
         .article-block-text_theme-icon(
           v-for='theme in article.themes'

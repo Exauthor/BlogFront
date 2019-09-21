@@ -15,7 +15,8 @@
             nuxt-link.edit-block(
               v-for='(article, i) in articles'
               :key='i'
-              :to="{ name: 'edit-id', params: { id: article.id } }")
+              :to='{ name: "edit-article", params: { article: article.id } }'
+            )
               .edit-block_title {{article.title}}
               .edit-block_theme-icons
                 .edit-block_theme-icon(
@@ -39,13 +40,14 @@ export default {
   data() {
     return {
       password: '',
-      state: 'choice' // or login
+      state: 'choice' // || login
     }
   },
+  async fetch({ store }) {
+    await store.dispatch('articles/getArticles')
+  },
   computed: {
-    ...mapState({
-      articles: 'allArticles'
-    })
+    ...mapState('articles', ['articles'])
   },
   methods: {
     createArticle() {
@@ -100,7 +102,12 @@ export default {
 
 .edit-block
   display flex
-  padding 5px
+  align-items center
+  justify-content space-between
+  padding 10px
+  margin-bottom 10px
+  border-radius 4px
+  background rgba(0, 0, 0, .3)
   cursor pointer
 
 .edit-block_theme-icons

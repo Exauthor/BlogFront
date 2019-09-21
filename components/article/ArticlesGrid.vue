@@ -10,8 +10,6 @@
         ArticleBlock(
           :article='article'
         )
-        // :style='`top: ${article.y || "0px"}; left: ${article.x || "0px"};`'
-        // :style='`transform: translate(${article.x || "0px"}, ${article.y || "0px"});`'
 </template>
 
 <script>
@@ -51,20 +49,23 @@ export default {
     }
   },
   mounted() {
-    this.minBlockSize = this.getPositionValueFromString(
-      this.getCSSVariable('--size-article-block'),
-      0.5
-    )
-
-    this.amountColumns =
-      parseFloat(this.getCSSVariable('--amount-article-blocks')) * 2
-
+    this.determineVariables()
     this.generateGrid()
     this.determinaHeight()
+
+    if (process.browser) {
+      window.addEventListener('resize', this.updateAll)
+    }
+  },
+  destroyed() {
+    if (process.browser) {
+      window.removeEventListener('resize', this.updateAll)
+    }
   },
   methods: {
     updateAll() {
       this.clearPosition()
+      this.determineVariables()
       this.generateGrid()
       this.determinaHeight()
     },
@@ -81,6 +82,15 @@ export default {
 
         return article
       })
+    },
+    determineVariables() {
+      this.minBlockSize = this.getPositionValueFromString(
+        this.getCSSVariable('--size-article-block'),
+        0.5
+      )
+
+      this.amountColumns =
+        parseFloat(this.getCSSVariable('--amount-article-blocks')) * 2
     },
     determinaHeight() {
       this.$refs.grid.style.height = this.getPositionValueFromString(

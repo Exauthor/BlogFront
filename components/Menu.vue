@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import ThemesSelector from '@/components/common/header/ThemesSelector'
 
 export default {
@@ -24,9 +25,10 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('articles', ['SET_SEARCH']),
     handleInput(e) {
       const text = e.target.value
-      console.log(text)
+      this.SET_SEARCH(text)
     }
   }
 }
@@ -53,6 +55,7 @@ export default {
   border none
   border 1px solid var(--color-active)
   background none
+  color var(--color-active)
   &:focus
     color var(--color-active)
     outline none

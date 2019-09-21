@@ -15,13 +15,10 @@
             legend Something text
             input(type='number' min='1' max='2' v-model='article.size[0]' required)
             input(type='number' min='1' max='2' v-model='article.size[1]' required)
-          article-block(:article='article')
-        //input#additional-settings(type='checkbox')
+          ArticleBlock.relative(:article='article')
+        input#additional-settings(type='checkbox')
         .additional-settings-block
           input(v-model='article.settings.background_header_component' placeholder='Article header component')
-          //input( placeholder='Article URL')
-          //input( placeholder='Article URL')
-          //input( placeholder='Article URL')
         input(v-model='article.id' placeholder='Article URL' required)
         label(for='archive') Archive
         input#archive(v-model='article.archive' type='checkbox')
@@ -34,13 +31,13 @@
           rows='10' placeholder='Article text' required='')
         vue-markdown(:source='article.body').markdown-block
         .additional-button
-          button.parse-text-area.gradient-link(@click="parseBody(article.body)") Parse Body
-          //div.view-in-markdown.gradient-link(@click="viewInMarkdown") View in markdown
+          button.parse-text-area.gradient-link(@click.prevent="parseBody(article.body)") Parse Body
         button.gradient-link(type='submit') Update
+        .gradient-link(@click='deleteArticle(id)') Delete
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 import VueMarkdown from 'vue-markdown'
 import ArticleBlock from '~/components/ArticleBlock.vue'
 
@@ -72,24 +69,31 @@ export default {
   },
   computed: {
     id() {
-      return this.$route.params.id
+      return this.$route.params.article
     },
-    ...mapGetters('articles', ['getArticle']),
     ...mapState({
       articles: 'allArticles'
     })
+  },
+  async asyncData({ params, store }) {
+    const articleFind = await store.dispatch(
+      'articles/getArticle',
+      params.article
+    )
+    return { articleFind }
   },
   mounted() {
     this.article = Object.assign(
       {},
       this.article,
-      this.getArticle(this.id, true)
+      JSON.parse(JSON.stringify(this.articleFind))
     )
     this.$refs.inputTheme.value = this.article.themes.join(' ')
 
     this.$prism()
   },
   methods: {
+    ...mapActions('articles', ['deleteArticle', 'createArticle']),
     putTheme(event) {
       const input = event.target.value.trim()
 
@@ -123,7 +127,6 @@ export default {
         menu.style.left = e.pageX + 'px'
         menu.style.top = e.pageY + 'px'
       })
-      // alert("CLICK")
     },
     updateMarkdown() {
       const repeat = this.article.body.split('```').length - 1
@@ -132,7 +135,7 @@ export default {
         this.$prism()
       }
     },
-    addArticle(
+    async addArticle(
       title,
       id,
       description,
@@ -146,35 +149,22 @@ export default {
       body = this.parseBody(body)
       id = id.replace(/ /gi, '_').toLowerCase()
 
+      delete this.article._id
+
       if (this.id !== this.article.id) {
-        // db.collection('articles').doc(this.id).delete().then(() => {
-        //   alert('Update');
-        //   console.log("Document successfully deleted!");
-        // }).catch(function(error) {
-        //   console.error("Error removing document: ", error);
-        // });
+        await this.deleteArticle(this.id)
       }
 
-      // db.collection('articles').doc(id).set({ title, description, size,
-      //   body, themes, img_src, archive, settings})
-      //   .then(() => {
-      //     alert('Update');
-      //     console.log("Document successfully created!");
-      //   }).catch(function(error) {
-      //     console.error("Error adding document: ", error);
-      //   });
+      await this.createArticle(this.article)
     },
     parseBody(body) {
       let text = ''
-      body.split('').forEach(function(item, i) {
+      body.split('').forEach((item, i) => {
         if (item.charCodeAt(0) === 10) {
           text += '\\n'
         } else {
           text += item
         }
-        // else if (item == "`") {
-        // text += "`"
-        // }
       })
       return text
     }
