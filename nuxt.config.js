@@ -28,7 +28,8 @@ export default {
   modules: ['@nuxtjs/axios', '@nuxtjs/pwa'],
 
   axios: {
-    baseURL: 'http://back:8080/'
+    baseURL: 'http://back:8080/',
+    browserBaseURL: 'http://localhost:8080/'
   },
 
   manifest: {
@@ -44,7 +45,7 @@ export default {
         .then((result) => {
           const articles = result.data.map((value) => value.id)
           console.log(articles, 'FROM GENERATE')
-          return callback(null, articles); 
+          return callback(null, articles);
 
           return ['linux_with_tor'] || result.map((value) => value.id)
         })
@@ -54,13 +55,13 @@ export default {
       //   data.map((value) => value.id
       //   db.collection('articles').get().then((qs) => {
       //     var articles = [];
-      //     qs.forEach((item) => { 
+      //     qs.forEach((item) => {
       //       if (item.data().archive !== true) {
       //         articles.push(`/articles/${item.id}`);
       //       }
       //     });
 
-      //     return callback(null, articles); 
+      //     return callback(null, articles);
       //   })
       // }
     }
