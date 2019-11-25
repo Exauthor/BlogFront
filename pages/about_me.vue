@@ -60,6 +60,7 @@ if (process.browser) {
             if (!d3.event.active) simulation.alphaTarget(0.3).restart()
             d.fx = d.x
             d.fy = d.y
+            console.log(d, 'NODE?')
           }
 
           function dragged(d) {
@@ -110,17 +111,16 @@ if (process.browser) {
           .append('g')
           .call(drag(simulations))
           .attr('class', 'circle-30')
-        // .on('click', (d,i) => {
-        // console.log('CLICK', d, i);
+          .on('click', (d, i) => {
+            console.log('CLICK', d, i)
+            d.vx = Math.random() * 300 + 50
+            d.vy = Math.random() * 300 + 50circle-30
 
-        // d.vx = Math.random() * 300 + 50;
-        // d.vy = Math.random() * 300 + 50;
+            data[14].fx = Math.random() * 300 + 50
+            data[14].fy = Math.random() * 300 + 50
 
-        /// /data[14].fx = Math.random() * 300 + 50;
-        /// /data[14].fy = Math.random() * 300 + 50;
-
-        // simulations.alphaTarget(0.3).restart()
-        // });
+            simulations.alphaTarget(0.3).restart()
+          })
 
         groups
           .append('circle')
@@ -425,3 +425,5 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus"></style>
