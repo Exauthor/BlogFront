@@ -6,9 +6,11 @@
 <script>
 export default {
   name: 'ArticleHeaderBackground',
-  props: ['component'],
-  mounted() {
-    console.log(this.component)
+  props: {
+    component: {
+      type: String,
+      default: ''
+    }
   }
 }
 </script>

@@ -120,13 +120,13 @@ if (process.browser) {
         // simulations.alphaTarget(0.3).restart()
         // });
 
-        const circles = groups
+        groups
           .append('circle')
           .attr('r', (d) => radiusScale(d.value))
           .attr('data-title', (d) => d.title)
           .attr('fill', (d) => `rgba(0,0,0,.4)`)
 
-        const images = groups
+        groups
           .append('image')
           .attr('x', (d) => -radiusScale(d.value) * 0.7)
           .attr('y', (d) => -radiusScale(d.value) * 0.7)

@@ -75,10 +75,7 @@ export const actions = {
       return article
     } else {
       const { data } = await this.$axios.get('/articles/' + id)
-      console.log(`GET FROM STORE ID: ${id} INFO: ${data}`)
       return data[0]
-      // await dispatch('getArticles')
-      // return getters.getArticle(id, option)
     }
   },
   async getArticles({ state, commit }) {

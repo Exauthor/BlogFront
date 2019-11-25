@@ -16,7 +16,7 @@
             rect(width='100%', height='100%', fill='transparent')
       .section-body_text.diagram-body_text
         div(v-for='obj in diagramObj', :id='`diagram-text-${obj.id}`')
-          h4  {{obj.title}} 
+          h4  {{obj.title}}
           p(v-for='paragraph in obj.desription') {{paragraph}}
 </template>
 
@@ -108,7 +108,6 @@ export default {
   },
   watch: {
     active() {
-      console.log(this.artive)
       if (this.active) {
         this.startAnimation()
       } else {
@@ -146,7 +145,7 @@ export default {
       )
       const parser = new DOMParser()
       const htmlDoc = parser.parseFromString(
-        `<g 
+        `<g
               xmlns="http://www.w3.org/2000/svg"
               xmlns:xlink="http://www.w3.org/1999/xlink"
               style="isolation:isolate">
@@ -196,7 +195,7 @@ export default {
       ]
 
       if (!(this.textBlockScrollDirection === undefined)) {
-        console.log('Start Touch Text.')
+        // console.log('Start Touch Text.')
         return
       }
 
