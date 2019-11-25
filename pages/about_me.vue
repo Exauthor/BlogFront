@@ -9,6 +9,8 @@
       h2.welcome.center-position Добро Пожаловать
     section.diagram
       h2 Диаграмма знаний
+    client-only
+      DateLearning
     section.about-me
       .fire
       h2 Приветик, я космический огонек.
@@ -18,7 +20,7 @@
 import * as d3 from 'd3'
 
 import { mapState } from 'vuex'
-import Diagram from '../components/about/Diagram.vue'
+import DateLearning from '../components/about/DateLearning.vue'
 import Fire from '../components/about/Fire.vue'
 let exp
 
@@ -418,7 +420,7 @@ if (process.browser) {
 export default {
   ...exp,
   components: {
-    Diagram,
+    DateLearning,
     Fire
   }
 }
