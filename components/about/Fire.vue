@@ -14,7 +14,6 @@
 export default {
   name: 'Fire',
   props: {
-    colors: {},
     active: {
       type: Boolean,
       default: false

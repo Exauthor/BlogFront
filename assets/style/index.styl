@@ -113,6 +113,10 @@ body
   opacity 0
   transform translateY(30px)
 
+.jc-space-between
+  display flex
+  justify-content space-between
+
 .container
   margin 0 auto
   min-height 100vh
@@ -131,13 +135,12 @@ body
   }
 }
 
-
 .layout-enter-active
   animation slideIn .4s
   animation-delay .4s
   opacity 0
 
-.layout-leave-active 
+.layout-leave-active
   animation slideOut .4s
 
 @keyframes slideOut {

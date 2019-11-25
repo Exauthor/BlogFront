@@ -4,8 +4,13 @@
         ul.menu-left-click(ref='leftClickMenu' v-if='activeLeftMenu')
           li(@click.prevent='addMenuLink') Добавить элемент меню
           li(@click.prevent='addTitle') Добавить заголовок
-      h3.edit-title Editor mode
+          li(@click.prevent='copySelectedText') Скопировать
+          li(@click.prevent='pasteSelectedText') Вставить
       form(@submit.prevent='addArticle(article.title, article.id, article.description, article.size, article.body, article.themes, article.img_src, article.archive, article.settings)')
+        .jc-space-between
+          router-link(:to='{name: "edit"}' class='article-back')
+          h3.edit-title Editor mode
+          router-link(:to='{name: "index"}' class='close')
         input(v-model='article.title' placeholder='Title' required)
         input(v-model='article.description' placeholder='Description' required)
         input(v-model='article.img_src' placeholder='Image Path' required)
@@ -23,17 +28,16 @@
         label(for='archive') Archive
         input#archive(v-model='article.archive' type='checkbox')
         textarea(
-          @input='updateMarkdown' 
-          @click.prevent.left='closeLeftMenu' 
-          @click.prevent.right='clickTextarea' 
+          @input='updateMarkdown'
+          @click.prevent.left='closeLeftMenu'
+          @click.prevent.right='clickTextarea'
           v-model='article.body'
           ref='textarea'
           rows='10' placeholder='Article text' required='')
         vue-markdown(:source='article.body').markdown-block
-        .additional-button
-          button.parse-text-area.gradient-link(@click.prevent="parseBody(article.body)") Parse Body
+        button.parse-text-area.gradient-link(@click.prevent="parseBody(article.body)") Parse Body
         button.gradient-link(type='submit') Update
-        .gradient-link(@click='deleteArticle(id)') Delete
+        button.gradient-link(@click='deleteArticle(id)') Delete
 </template>
 
 <script>
@@ -94,6 +98,12 @@ export default {
   },
   methods: {
     ...mapActions('articles', ['deleteArticle', 'createArticle']),
+    copySelectedText() {
+      console.log('Init copySelectedText')
+    },
+    pasteSelectedText() {
+      console.log('Init pasteSelectedText')
+    },
     putTheme(event) {
       const input = event.target.value.trim()
 
