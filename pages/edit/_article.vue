@@ -6,14 +6,14 @@
           li(@click.prevent='addTitle') Добавить заголовок
           li(@click.prevent='copySelectedText') Скопировать
           li(@click.prevent='pasteSelectedText') Вставить
-      form(@submit.prevent='addArticle(article.title, article.id, article.description, article.size, article.body, article.themes, article.img_src, article.archive, article.settings)')
+      form(@submit.prevent='addArticle(article.title, article.id, article.description, article.size, article.body, article.themes, article.imgSrc, article.archive, article.settings)')
         .jc-space-between
           router-link(:to='{name: "edit"}' class='article-back')
           h3.edit-title Editor mode
           router-link(:to='{name: "index"}' class='close')
         input(v-model='article.title' placeholder='Title' required)
         input(v-model='article.description' placeholder='Description' required)
-        input(v-model='article.img_src' placeholder='Image Path' required)
+        input(v-model='article.imgSrc' placeholder='Image Path' required)
         input(ref='inputTheme' @input='putTheme' placeholder='Themes' required)
         .double-block
           fieldset
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import VueMarkdown from 'vue-markdown'
 import ArticleBlock from '~/components/ArticleBlock.vue'
 
@@ -52,13 +52,26 @@ export default {
     VueMarkdown,
     ArticleBlock
   },
+  metaInfo() {
+    return {
+      title: this.article.title,
+      titleTemplate: 'EDIT | %s',
+      meta: [
+        {
+          vmid: 'description',
+          name: 'description',
+          content: this.article.description
+        }
+      ]
+    }
+  },
   data() {
     return {
       activeLeftMenu: false,
       article: {
         title: 'TITLE',
         description: '',
-        img_src: '',
+        imgSrc: '',
         size: [1, 1],
         themes: [],
         id: '',
@@ -99,10 +112,10 @@ export default {
   methods: {
     ...mapActions('articles', ['deleteArticle', 'createArticle']),
     copySelectedText() {
-      console.log('Init copySelectedText')
+      // Init copySelectedText
     },
     pasteSelectedText() {
-      console.log('Init pasteSelectedText')
+      // Init pasteSelectedText
     },
     putTheme(event) {
       const input = event.target.value.trim()
@@ -152,7 +165,7 @@ export default {
       size,
       body,
       themes,
-      img_src,
+      imgSrc,
       archive,
       settings
     ) {

@@ -1,28 +1,23 @@
 <template lang="pug">
   .edit-body
-    div(v-if='state === "login"').center
-      form(@submit.prevent='insertPass(password)')
-        input(v-model='password' placeholder='pass' required)
-        button(type='submit') Log In
-    div(v-else-if='state === "choice"')
-      h2 CHOISE
-      .body-choise
-        .body-choise_create.gradient-link
-          h4(@click='createArticle') Create
-        .body-choise_edit
-          h4 Edit
-          .body-choise_edit-blocks
-            nuxt-link.edit-block(
-              v-for='(article, i) in articles'
-              :key='i'
-              :to='{ name: "edit-article", params: { article: article.id } }'
-            )
-              .edit-block_title {{article.title}}
-              .edit-block_theme-icons
-                .edit-block_theme-icon(
-                  v-for='theme in article.themes'
-                  :style="`background-image: url('/img/article-icons/${theme}.svg')`"
-                  :title='theme')
+    h2 CHOISE
+    .body-choise
+      .body-choise_create.gradient-link
+        h4(@click='createArticle') Create
+      .body-choise_edit
+        h4 Edit
+        .body-choise_edit-blocks
+          nuxt-link.edit-block(
+            v-for='(article, i) in articles'
+            :key='i'
+            :to='{ name: "edit-article", params: { article: article.id } }'
+          )
+            .edit-block_title {{article.title}}
+            .edit-block_theme-icons
+              .edit-block_theme-icon(
+                v-for='theme in article.themes'
+                :style="`background-image: url('/img/article-icons/${theme}.svg')`"
+                :title='theme')
 </template>
 
 <script>
@@ -37,17 +32,17 @@ export default {
     ArticleBlock,
     VueMarkdown
   },
-  data() {
-    return {
-      password: '',
-      state: 'choice' // || login
-    }
+  computed: {
+    ...mapState('articles', ['articles'])
   },
   async fetch({ store }) {
     await store.dispatch('articles/getArticles')
   },
-  computed: {
-    ...mapState('articles', ['articles'])
+  metaInfo() {
+    return {
+      title: 'Admin',
+      titleTemplate: '%s | Sisuphys Blog'
+    }
   },
   methods: {
     createArticle() {
@@ -55,11 +50,6 @@ export default {
     },
     viewInMarkdown() {
       this.$prism()
-    },
-    insertPass(pass) {
-      if (pass === 'New') {
-        this.state = 'choice'
-      }
     }
   }
 }
