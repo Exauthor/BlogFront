@@ -25,7 +25,7 @@
     "@nuxtjs/pwa": "^3.0.0-0",
     "d3": "^5.9.2",
     "nuxt": "^2.9.2",
-    "prismjs": "^1.15.0",
+    "prismjs": "^1.21.0",
     "vue-markdown": "^2.2.4"
   },
   "devDependencies": {
